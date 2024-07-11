@@ -1,5 +1,3 @@
-# This is a sample Python script.
-
 # Press Mayús+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
@@ -16,7 +14,7 @@ st.title('Análisis y Visualización de Datos')
 # Cargar y mostrar archivo CSV
 uploaded_file_csv = st.file_uploader("Elige un archivo CSV", type="csv", key="csv")
 
-# Cargar y mostrar archivo de mapa (GeoJSON) 
+# Cargar y mostrar archivo de mapa (GeoJSON)
 uploaded_file_geojson = st.file_uploader("Elige un archivo de mapa (GeoJSON)", type="geojson", key="geojson")
 
 if uploaded_file_csv is not None:
@@ -27,34 +25,30 @@ if uploaded_file_csv is not None:
     x_column = st.selectbox("Selecciona la variable X", df.columns)
     y_column = st.selectbox("Selecciona la variable Y", df.columns)
 
-   # Función para generar gráficos
-def generar_graficos(df):
-    st.sidebar.title("Opciones de Gráficos")
-    tipo_grafico = st.sidebar.selectbox("Selecciona el tipo de gráfico",
-                                        ["Barras", "Tortas", "Líneas", "Scatter", "Histograma"])
-    columna = st.sidebar.selectbox("Selecciona la columna para el gráfico", df.columns)
+    # Opciones de gráficos
+    chart_type = st.selectbox("Elige el tipo de gráfico", ['Barras', 'Torta', 'Lineal', 'Scatter'])
 
-    if tipo_grafico == "Barras":
-        st.bar_chart(df[columna])
-    elif tipo_grafico == "Tortas":
+    if chart_type == 'Barras':
+        # Crear un gráfico de barras
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=x_column, y=y_column, data=df)
+        st.pyplot(plt)
+    elif chart_type == 'Torta':
+        # Crear un gráfico de torta si y_column es seleccionable
+        pie_data = df[y_column].value_counts()
         plt.figure(figsize=(8, 8))
-        plt.pie(df[columna].value_counts(), labels=df[columna].value_counts().index, autopct='%1.1f%%')
+        plt.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%')
         st.pyplot(plt)
-    elif tipo_grafico == "Líneas":
-        st.line_chart(df[columna])
-    elif tipo_grafico == "Scatter":
-        if 'latitude' in df.columns and 'longitude' in df.columns:
-            st.map(df)
-        else:
-            st.error(
-                "El DataFrame no contiene las columnas 'latitude' y 'longitude' para un gráfico scatter geográfico.")
-    elif tipo_grafico == "Histograma":
-        plt.hist(df[columna], bins=15)
-        plt.title(f"Histograma de {columna}")
-        plt.xlabel(columna)
-        plt.ylabel("Frecuencia")
+    elif chart_type == 'Lineal':
+        # Crear un gráfico lineal
+        plt.figure(figsize=(10, 6))
+        sns.lineplot(x=x_column, y=y_column, data=df)
         st.pyplot(plt)
-
+    elif chart_type == 'Scatter':
+        # Crear un gráfico de dispersión
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=x_column, y=y_column, data=df)
+        st.pyplot(plt)
 
 if uploaded_file_geojson is not None:
     gdf = gpd.read_file(uploaded_file_geojson)
@@ -72,3 +66,7 @@ if uploaded_file_geojson is not None:
 
     # Usar st.map para visualizar los datos
     st.map(df_for_st_map)
+
+        
+        
+        
